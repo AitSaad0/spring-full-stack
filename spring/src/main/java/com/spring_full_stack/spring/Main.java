@@ -11,10 +11,6 @@ public class Main {
 
         var context = new AnnotationConfigApplicationContext(ProjectConfig.class);
 
-        Person person = context.getBean(Person.class);
-        Vehicule Tesla = context.getBean(Vehicule.class);
-
-        System.out.println(person.getName() + " had a " + person.getVehicule());
 
     }
 }
