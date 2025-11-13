@@ -1,15 +1,15 @@
 package com.spring_full_stack.spring.controller;
 
 
+import com.spring_full_stack.spring.dto.ProductDto;
 import com.spring_full_stack.spring.entity.Product;
-import com.spring_full_stack.spring.repository.ProductRepository;
-import com.spring_full_stack.spring.service.ProductService;
+import com.spring_full_stack.spring.service.IProductService;
+import com.spring_full_stack.spring.service.impl.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -17,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductService productService;
+    private final IProductService iProductService;
 
     @GetMapping
-    public List<Product> getString(){
-        List<Product> productList = productService.getList();
+    public List<ProductDto> getString(){
+        List<ProductDto> productList = iProductService.getProduct();
         return productList;
     }
 }
