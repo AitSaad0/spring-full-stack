@@ -3,6 +3,7 @@ package com.spring_full_stack.spring.controller;
 
 import com.spring_full_stack.spring.entity.Product;
 import com.spring_full_stack.spring.repository.ProductRepository;
+import com.spring_full_stack.spring.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     @GetMapping
     public List<Product> getString(){
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productService.getList();
         return productList;
     }
 }
