@@ -8,6 +8,4 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan({"com.spring_full_stack.spring"})
 public class ProjectConfig {
 
-
-
 }
