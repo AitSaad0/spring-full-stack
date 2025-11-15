@@ -22,6 +22,7 @@ public class ProductController {
     @GetMapping
     public List<ProductDto> getString(){
         List<ProductDto> productList = iProductService.getProduct();
+        System.out.println("productList");
         return productList;
     }
 }
