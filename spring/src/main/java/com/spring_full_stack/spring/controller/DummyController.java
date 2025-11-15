@@ -3,6 +3,8 @@ package com.spring_full_stack.spring.controller;
 
 import com.spring_full_stack.spring.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -15,6 +17,14 @@ public class DummyController {
     public String createUser(@RequestBody UserDto userDto){
         System.out.println(userDto);
         return "user created";
+    }
+
+    @PostMapping("/request-entity")
+    public String createUserWithEntity(RequestEntity<UserDto> requestEntity){
+        HttpHeaders headers = requestEntity.getHeaders();
+        UserDto userdto = requestEntity.getBody();
+        System.out.println(userdto);
+        return "user created " + headers.get("user-Agent").toString();
     }
 
 
