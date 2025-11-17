@@ -2,6 +2,7 @@ package com.spring_full_stack.spring.controller;
 
 
 import com.spring_full_stack.spring.dto.UserDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class DummyController {
 
     @PostMapping("/create-user")
-    public String createUser(@RequestBody UserDto userDto){
+    public String createUser(@Valid @RequestBody UserDto userDto){
         System.out.println(userDto);
         return "user created";
     }
