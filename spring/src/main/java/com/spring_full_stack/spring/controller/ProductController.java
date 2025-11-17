@@ -22,7 +22,7 @@ public class ProductController {
 
     private final IProductService iProductService;
 
-    @GetMapping
+    @GetMapping("/get-products")
     public ResponseEntity<List<ProductDto>> getString(){
         List<ProductDto> productList = iProductService.getProduct();
         System.out.println("productList");
