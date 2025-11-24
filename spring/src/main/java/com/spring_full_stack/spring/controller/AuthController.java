@@ -26,7 +26,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -62,7 +65,20 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> apiRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
+    public ResponseEntity<?> apiRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
+
+        Optional<Customer> existCustomer = customerRepository.findByEmailOrMobileNumber(registerRequestDto.getEmail(), registerRequestDto.getMobileNumber());
+        if(existCustomer.isPresent()){
+            Map<String, String> errors = new HashMap<>();
+            Customer customer = existCustomer.get();
+            if(customer.getEmail().equalsIgnoreCase(registerRequestDto.getEmail())){
+                errors.put("email", "Email already exists");
+            }
+            if(customer.getMobileNumber().equalsIgnoreCase(registerRequestDto.getMobileNumber())){
+                errors.put("mobileNumber", "Mobile number already exists");
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
         Customer customer = new Customer();
         BeanUtils.copyProperties(registerRequestDto, customer);
         customer.setPasswordHash( passwordEncoder.encode(registerRequestDto.getPassword()));
