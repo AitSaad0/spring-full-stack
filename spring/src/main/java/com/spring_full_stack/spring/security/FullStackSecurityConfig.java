@@ -80,9 +80,8 @@ public class FullStackSecurityConfig {
      * This manager is responsible for authenticating users.
      */
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder) {
         var daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         var providerManager = new ProviderManager(daoAuthenticationProvider);
         return providerManager;

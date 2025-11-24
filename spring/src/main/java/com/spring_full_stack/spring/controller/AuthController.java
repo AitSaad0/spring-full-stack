@@ -4,9 +4,12 @@ import com.spring_full_stack.spring.dto.LoginRequestDto;
 import com.spring_full_stack.spring.dto.LoginResponseDto;
 import com.spring_full_stack.spring.dto.RegisterRequestDto;
 import com.spring_full_stack.spring.dto.UserDto;
+import com.spring_full_stack.spring.entity.Customer;
+import com.spring_full_stack.spring.repository.CustomerRepository;
 import com.spring_full_stack.spring.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +34,7 @@ import java.util.List;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final InMemoryUserDetailsManager inMemoryUserDetailsManager;
+    private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
@@ -60,9 +63,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> apiRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
-        inMemoryUserDetailsManager.createUser(new User(registerRequestDto.getEmail(),
-                passwordEncoder.encode(registerRequestDto.getPassword()),
-                List.of(new SimpleGrantedAuthority("USER"))));
+        Customer customer = new Customer();
+        BeanUtils.copyProperties(registerRequestDto, customer);
+        customer.setPasswordHash( passwordEncoder.encode(registerRequestDto.getPassword()));
+        customerRepository.save(customer);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Registration successful");
