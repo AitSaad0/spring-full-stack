@@ -12,7 +12,8 @@ public class PublicPathMethod {
     public List<String> publicPaths() {
         return List.of(
                 "/api/v1/products/**",
-                "/api/v1/auth/**"
+                "/api/v1/auth/**",
+                "/h2-console/**"
         );
     };
 

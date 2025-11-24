@@ -30,31 +30,57 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FullStackSecurityConfig {
 
+    // List of public (non-authenticated) paths injected from configuration
     private final List<String> publicPaths;
 
-
+    /**
+     * Configures Spring Security's main security filter chain.
+     * - Disables CSRF (useful for APIs)
+     * - Enables CORS using the corsConfigurationSource()
+     * - Allows all requests defined in publicPaths
+     * - Requires authentication for any other endpoint
+     * - Enables form login and basic authentication
+     */
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(csrfConfig -> csrfConfig.disable())
+        return http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .cors(corsConfig -> corsConfig.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((requests) -> {
                     publicPaths.forEach(path -> requests.requestMatchers(path).permitAll());
                     requests.anyRequest().authenticated();
-        }
-        )
+                })
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .build();
     }
 
+    /**
+     * Creates an in-memory user store with a single "admin" user.
+     * This is mainly for testing/demo purposes.
+     * The password is already encoded with BCrypt.
+     */
     @Bean
     public UserDetailsService userDetailsService() {
-        var user = User.builder().username("admin").password("$2a$12$R/86nPFzOJCYzFoNhPZkhujVph7zGCIPLACarECAzsi1WdCGbwFO2").roles("ADMIN").build();
-        return new  InMemoryUserDetailsManager(user);
+        var user = User.builder()
+                .username("admin")
+                .password("$2a$12$R/86nPFzOJCYzFoNhPZkhujVph7zGCIPLACarECAzsi1WdCGbwFO2")
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(user);
     }
 
+    /**
+     * Creates an AuthenticationManager using:
+     * - DaoAuthenticationProvider
+     * - The custom UserDetailsService
+     * - The BCrypt password encoder
+     *
+     * This manager is responsible for authenticating users.
+     */
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,  PasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         var daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
@@ -62,10 +88,22 @@ public class FullStackSecurityConfig {
         return providerManager;
     }
 
+    /**
+     * Creates a BCrypt password encoder.
+     * Used to hash and verify passwords safely.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    /**
+     * Defines a CORS configuration for the backend.
+     * - Allows requests from http://localhost:5173 (React/Vite frontend)
+     * - Allows all HTTP methods and all headers
+     * - Supports credentials (cookies, authorization headers, etc.)
+     * - Caches CORS preflight responses for 1 hour
+     */
 
 
     @Bean
@@ -81,5 +119,4 @@ public class FullStackSecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }
